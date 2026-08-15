@@ -19,6 +19,7 @@ from typing import Any
 
 from client.channel import ChannelError, render_order_body, submit_order
 from client.contracts import Verdict, WorkOrder
+from client.pay import PaymentError, settle
 
 CLIENT_ID = "client-agent"
 
@@ -156,12 +157,31 @@ def run_adversarial(dry_run: bool) -> int:
     return 0
 
 
+def run_pay(amount_usd: str, order_id: str, dry_run: bool) -> int:
+    """Settle an invoice. The client holds the payment credential, not the firm."""
+    amount = Decimal(amount_usd)
+    if dry_run:
+        print(f"would settle {amount} USD for {order_id} via PaymentIntent (pm_card_visa)")
+        return 0
+    try:
+        result = settle(amount, order_id=order_id)
+    except PaymentError as exc:
+        print(f"settlement failed: {exc}", file=sys.stderr)
+        return 1
+    print(json.dumps(result, indent=2, sort_keys=True))
+    return 0
+
+
 def main(argv: list[str] | None = None) -> int:
     p = argparse.ArgumentParser(prog="client", description=__doc__)
     p.add_argument("--question", default="Is a 2-year non-compete enforceable in California?")
     p.add_argument("--adversarial", action="store_true", help="run the attack lane (test mode)")
+    p.add_argument("--pay", metavar="USD", help="settle an invoice for this amount")
+    p.add_argument("--order-id", default="wo-1", help="order the payment settles")
     p.add_argument("--dry-run", action="store_true", help="print payloads, send nothing")
     args = p.parse_args(argv)
+    if args.pay:
+        return run_pay(args.pay, args.order_id, args.dry_run)
     if args.adversarial:
         return run_adversarial(args.dry_run)
     return run_normal(args.question, args.dry_run)

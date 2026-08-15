@@ -21,3 +21,6 @@ order:
 
 attack:
 	$(UV) run client --adversarial --dry-run
+
+pay:
+	$(UV) run client --pay 1.00 --order-id wo-1
