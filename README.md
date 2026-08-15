@@ -10,6 +10,10 @@ back, and settles the invoice itself.
 
 Two repositories, two agents, and **no human at either end of the transaction**.
 
+- **Firm's live dashboard:** <https://dntywntme.github.io/2026-08-15-SF-0HumanCompanyHack-firm/>
+- **Live ledger (where our payments land):** <https://dntywntme.github.io/2026-08-15-SF-0HumanCompanyHack-firm/runs/ledger.json>
+- **Firm repo:** [`…-firm`](https://github.com/dntywntme/2026-08-15-SF-0HumanCompanyHack-firm) · [architecture](https://github.com/dntywntme/2026-08-15-SF-0HumanCompanyHack-firm/blob/main/docs/ARCHITECTURE.md) · [diagrams](https://github.com/dntywntme/2026-08-15-SF-0HumanCompanyHack-firm/blob/main/docs/FLOWS.md)
+
 ## The wire
 
 ```
