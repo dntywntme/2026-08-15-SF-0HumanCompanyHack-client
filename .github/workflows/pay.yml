@@ -1,0 +1,44 @@
+name: pay
+
+# The client agent settling an invoice, unattended. This is the leg that makes
+# the two repositories a real pair of counterparties rather than one program in
+# two folders: the payer holds the payment credential, runs on its own
+# infrastructure, and the firm only ever observes that money arrived.
+
+on:
+  workflow_dispatch:
+    inputs:
+      amount_usd:
+        description: "Amount to settle (USD). Stripe rejects anything under 0.50."
+        required: true
+        default: "1.00"
+      order_id:
+        description: "Work order this payment settles"
+        required: true
+        default: "wo-1"
+
+permissions:
+  contents: read
+
+jobs:
+  settle:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v7
+        with:
+          python-version: "3.12"
+
+      - run: uv sync
+
+      - name: Settle the invoice
+        env:
+          # sk_test_ only. pay.py refuses any other key shape, so an agent
+          # settling with no human in the loop cannot reach live money.
+          CLIENT_STRIPE_KEY: ${{ secrets.CLIENT_STRIPE_KEY }}
+        run: |
+          uv run client \
+            --pay "${{ inputs.amount_usd }}" \
+            --order-id "${{ inputs.order_id }}"
