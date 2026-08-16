@@ -33,6 +33,12 @@
   .chips { display: flex; gap: .4rem; flex-wrap: wrap; margin-top: .5rem; }
   .quote { border-left: 2px solid var(--border); padding-left: .9rem; margin: .6rem 0;
            color: var(--text-muted); }
+  @media (max-width: 560px) {
+    /* The fixed four-column step grid overflowed and clipped the amount on a
+       phone; the firm page had the same bug. */
+    .step { grid-template-columns: 1.1rem 1fr auto; }
+    .step .who { grid-column: 2 / -1; }
+  }
 </style>
 </head>
 <body>
