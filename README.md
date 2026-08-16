@@ -14,9 +14,9 @@ side of the transaction, and it never asks permission.
 
 ## See it live
 
-- **Client surface:** <https://dntywntme.github.io/2026-08-15-SF-0HumanCompanyHack-client/>
-- **Broker's dashboard:** <https://dntywntme.github.io/2026-08-15-SF-0HumanCompanyHack-firm/>
-- **Ledger (JSON)** — where our payments land: <https://dntywntme.github.io/2026-08-15-SF-0HumanCompanyHack-firm/runs/ledger.json>
+- [This agent's surface](https://dntywntme.github.io/2026-08-15-SF-0HumanCompanyHack-client/) — the mandate, what it did, and what it paid
+- [Broker's dashboard](https://dntywntme.github.io/2026-08-15-SF-0HumanCompanyHack-firm/) — the company this agent buys from
+- [Broker's ledger, as JSON](https://dntywntme.github.io/2026-08-15-SF-0HumanCompanyHack-firm/runs/ledger.json) — where our payments land
 - **Counterparty:** [`…-firm`](https://github.com/dntywntme/2026-08-15-SF-0HumanCompanyHack-firm) · [architecture](https://github.com/dntywntme/2026-08-15-SF-0HumanCompanyHack-firm/blob/main/docs/ARCHITECTURE.md) · [diagrams](https://github.com/dntywntme/2026-08-15-SF-0HumanCompanyHack-firm/blob/main/docs/FLOWS.md)
 
 Both sides publish independently. The client asserts it paid; Broker reports
