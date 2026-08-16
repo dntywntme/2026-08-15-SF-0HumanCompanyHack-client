@@ -41,6 +41,14 @@
     .step { grid-template-columns: 1.1rem 1fr auto; }
     .step .who { grid-column: 2 / -1; }
   }
+  /* Progressive disclosure: explanation collapses so the evidence stays above
+     the fold. Marker replaced because the native one sits inconsistently. */
+  details.chart-card > summary { cursor: pointer; list-style: none; }
+  details.chart-card > summary::-webkit-details-marker { display: none; }
+  details.chart-card > summary::after { content: " \25B8"; color: var(--text-muted); font-weight: 400; }
+  details.chart-card[open] > summary::after { content: " \25BE"; }
+  details.chart-card > summary:focus-visible { outline: 2px solid var(--primary); outline-offset: 3px; }
+  #glance dd a { color: inherit; }
 </style>
 </head>
 <body>
@@ -58,21 +66,28 @@
     human under a standing mandate &mdash; the kind a calendar gives you: <em>the
     investor meeting is at six, and nobody wants to be woken up to approve a
     one-dollar purchase.</em> So it places the order, judges what comes back, and
-    settles the invoice itself.
-  </p>
-  <p class="app-sub">
-    It buys from <a href="https://dntywntme.github.io/2026-08-15-SF-0HumanCompanyHack-firm/">Broker</a>,
-    an agent-run company. Two repositories, two agents, and no human at either
+    settles the invoice itself. Two repositories, two agents, no human at either
     end.
   </p>
+
+  <!-- The whole argument in four lines, each pointing at the evidence for it.
+       Everything below this is detail; a reader who stops here has the case. -->
+  <section class="chart-card" id="glance">
+    <dl class="pnl">
+      <dt>What it does</dt>
+      <dd>orders a verdict, judges it, and pays &mdash; <a href="#flow">every step it took</a></dd>
+      <dt>Who it buys from</dt>
+      <dd><a href="https://dntywntme.github.io/2026-08-15-SF-0HumanCompanyHack-firm/">Broker</a>, an agent-run company in its own repository</dd>
+      <dt>What it never does</dt>
+      <dd>ask a human. The mandate was granted once, with a ceiling, and it spends inside it</dd>
+      <dt>Check it yourself</dt>
+      <dd><code>make order</code> and <code>make attack</code> print the exact payloads and send nothing</dd>
+    </dl>
+  </section>
 
   <section class="chart-card">
     <h2 class="chart-title">The mandate</h2>
     <p class="quote" id="mandate">&mdash;</p>
-    <p class="mono muted">
-      The assistant does not ask permission per purchase. It was granted a
-      standing authority once, with a ceiling, and it spends inside it.
-    </p>
   </section>
 
   <section class="chart-card">
@@ -91,18 +106,11 @@
     <p class="mono" id="verdict">&mdash;</p>
   </section>
 
-  <section class="chart-card">
-    <h2 class="chart-title">It also attacks</h2>
-    <p class="muted">
-      The same agent runs an adversarial lane against Broker, over the real
-      wire, from an identity that is not inside it. An attack Broker survives
-      is only evidence if the attacker was never inside.
-    </p>
-    <div class="chips" id="attacks"></div>
-  </section>
-
-  <section class="chart-card">
-    <h2 class="chart-title">Credentials</h2>
+  <!-- Attacks and credentials were two cards making one argument: that the
+       boundary is real and enforced rather than agreed. One section, collapsed,
+       because it explains rather than evidences. -->
+  <details class="chart-card">
+    <summary class="chart-title">The boundary, and how it is enforced</summary>
     <p class="muted">
       The payer holds the payment credential; Broker holds a read-only key and
       can only observe that money arrived. A supplier who can charge you at will
@@ -112,7 +120,13 @@
       client &rarr; sk_test_ (settles) &middot; Broker &rarr; rk_ (reads) &middot;
       settlement refuses any key that is not a test key
     </p>
-  </section>
+    <p class="muted">
+      The same agent also runs an adversarial lane against Broker, over the real
+      wire, from an identity that is not inside it. An attack Broker survives is
+      only evidence if the attacker was never inside.
+    </p>
+    <div class="chips" id="attacks"></div>
+  </details>
 
 </main>
 
