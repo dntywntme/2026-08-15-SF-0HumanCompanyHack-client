@@ -1,0 +1,74 @@
+/*
+ * a11y.css — accessibility baseline for the qte77 theme control.
+ * Reference impl: analyze-stock-kpi (decision D3). Load after eyerest.css.
+ */
+
+/* Screen-reader-only: the live-region announce text is visually hidden but read aloud. */
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  clip-path: inset(50%);
+  white-space: nowrap;
+  border: 0;
+}
+
+/*
+ * Width-sizer: reserve the widest label ("System") so cycling System↔Light↔Dark never
+ * reflows the toolbar (no jitter). The invisible ::before sets the box width; the visible
+ * label sits in normal flow.
+ */
+#theme-toggle .theme-label {
+  display: inline-block;
+  text-align: left;
+}
+#theme-toggle .theme-label::before {
+  content: "System"; /* keep in sync with WIDEST_LABEL in theme.js */
+  display: block;
+  height: 0;
+  overflow: hidden;
+  visibility: hidden;
+}
+
+/* Visible focus — never rely on color alone. */
+#theme-toggle:focus-visible,
+.nav-toggle:focus-visible,
+.section-nav button:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
+}
+
+/* Skip link — the first focusable thing on the page, so a keyboard or screen-reader user can jump the
+   header/nav straight to <main id="main">. Off-canvas until focused rather than .sr-only, because it
+   has to become VISIBLE on focus (a permanently hidden skip link helps nobody). */
+.skip-link {
+  position: absolute;
+  left: 8px;
+  top: -100%;
+  z-index: 100;
+  background: var(--surface-lift);
+  color: var(--text);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: 8px 12px;
+  font-family: var(--font-sans);
+  font-size: 0.875rem;
+  text-decoration: none;
+}
+.skip-link:focus { top: 8px; }
+
+/* Honor reduced-motion globally (paperverse #77). */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}

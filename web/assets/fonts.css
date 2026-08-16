@@ -1,0 +1,65 @@
+/*
+ * fonts.css — qte77 UI-branding TYPOGRAPHY (EyeRest).
+ *
+ * Vendored from qte77/brand/ui-kit/fonts.css. Two edits for this repo's ui/ layout:
+ *   1. url("../fonts/…") → url("fonts/…") — fonts live in ui/assets/fonts/, next to this file.
+ *   2. woff2-only (dropped the .ttf fallback lines) — keeps the vendored tree light; woff2 is
+ *      universal since ~2018 and every target browser supports it.
+ * Pair with linear.css (colour, spacing, shape) — which superseded the vendored eyerest.css and
+ * layout.css (both removed).
+ *
+ * Licenses: Inter + JetBrains Mono are SIL OFL 1.1.
+ */
+
+@font-face {
+  font-family: "Inter";
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url("fonts/Inter-Regular.woff2") format("woff2");
+}
+@font-face {
+  font-family: "Inter";
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+  src: url("fonts/Inter-Bold.woff2") format("woff2");
+}
+@font-face {
+  font-family: "JetBrains Mono";
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url("fonts/JetBrainsMono-Regular.woff2") format("woff2");
+}
+@font-face {
+  font-family: "JetBrains Mono";
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+  src: url("fonts/JetBrainsMono-Bold.woff2") format("woff2");
+}
+
+:root {
+  /* fallbacks resolve before the web font loads (font-display: swap) */
+  --font-sans: "Inter", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --font-mono: "JetBrains Mono", ui-monospace, "SF Mono", monospace;
+  --text-base: 16px;
+  --leading: 1.6;
+  --text-mono: 14px;
+  --leading-mono: 1.5;
+}
+
+/* ---------- Base type application ---------- */
+body {
+  font-family: var(--font-sans);
+  font-size: var(--text-base);
+  line-height: var(--leading);
+}
+code, kbd, samp, pre {
+  font-family: var(--font-mono);
+  font-size: var(--text-mono);
+  line-height: var(--leading-mono);
+}
+/* numeric data is tabular mono */
+.num, [data-numeric] { font-family: var(--font-mono); font-variant-numeric: tabular-nums; }

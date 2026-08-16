@@ -1,0 +1,27 @@
+{
+  "mandate": "Investor pitch at 18:00. Standing authority to buy decision support under $1.00.",
+  "order": {
+    "id": "wo-1",
+    "budget_usd": "1.00",
+    "question": "Which headline is more compelling: 'Ship faster with AI' or 'Your on-call engineer that never sleeps'?"
+  },
+  "evaluation": {
+    "acceptable": true,
+    "reason": "sourced from humans, priced inside budget",
+    "pay_usd": "1.00"
+  },
+  "settlement": {
+    "id": "pi_3U4qf2RnJXMb8QAR0937akpA",
+    "status": "succeeded",
+    "amount_usd": "1.00",
+    "livemode": false
+  },
+  "attacks": [
+    "prompt-injection",
+    "field-smuggling",
+    "free-riding",
+    "cogs-drain",
+    "exfiltration",
+    "malformed"
+  ]
+}

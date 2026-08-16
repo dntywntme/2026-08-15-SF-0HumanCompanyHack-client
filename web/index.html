@@ -1,0 +1,164 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Client — an assistant that buys, judges, and pays</title>
+<meta name="description" content="A personal assistant acting for a human under a standing mandate. It orders, evaluates, and settles — without waking anyone up.">
+<link rel="stylesheet" href="assets/fonts.css">
+<link rel="stylesheet" href="assets/linear.css">
+<link rel="stylesheet" href="assets/a11y.css">
+<style>
+  .app-main { max-width: 1120px; margin-inline: auto; padding-inline: 24px; }
+  .app-header .brand { padding-inline: 24px; }
+  .app-sub { max-width: 68ch; }
+  .app-title { font-size: clamp(2rem, 3.4vw + 1rem, 2.9rem); line-height: 1.1; }
+  .muted { color: var(--text-muted); }
+  .mono { font-family: var(--font-mono); font-size: .85rem; }
+  .flow { display: grid; gap: 0; }
+  .step { display: grid; grid-template-columns: 1.6rem 7rem 1fr auto; gap: .75rem;
+          align-items: start; padding: .8rem 0; border-top: 1px solid var(--border); }
+  .step:first-child { border-top: 0; }
+  .dot { width: .7rem; height: .7rem; border-radius: 50%; margin-top: .4rem;
+         background: var(--primary); box-shadow: 0 0 0 3px var(--glow); }
+  .dot.pay { background: var(--success); }
+  .dot.hold { background: var(--text-muted); }
+  .who { font-family: var(--font-mono); font-size: .8rem; color: var(--text-muted);
+         text-transform: uppercase; letter-spacing: .04em; margin-top: .15rem; }
+  .did { font-weight: 700; }
+  .why { color: var(--text-muted); font-size: .92rem; margin: .15rem 0 0; }
+  .amt { font-family: var(--font-mono); font-weight: 700; white-space: nowrap; }
+  .amt.out { color: var(--success); }
+  .amt.zero { color: var(--text-muted); font-weight: 400; }
+  .chips { display: flex; gap: .4rem; flex-wrap: wrap; margin-top: .5rem; }
+  .quote { border-left: 2px solid var(--border); padding-left: .9rem; margin: .6rem 0;
+           color: var(--text-muted); }
+</style>
+</head>
+<body>
+
+<header class="app-header">
+  <div class="brand"><span class="brand-dot"></span> Client</div>
+</header>
+
+<main class="app-main">
+
+  <p class="eyebrow">Zero-Human Company Hackathon &middot; San Francisco &middot; 2026-08-15</p>
+  <h1 class="app-title">An assistant that buys, judges, and pays.</h1>
+  <p class="app-sub">
+    This is the other side of the transaction. A personal assistant acting for a
+    human under a standing mandate &mdash; the kind a calendar gives you: <em>the
+    investor meeting is at six, and nobody wants to be woken up to approve a
+    one-dollar purchase.</em> So it places the order, judges what comes back, and
+    settles the invoice itself.
+  </p>
+  <p class="app-sub">
+    It buys from <a href="https://dntywntme.github.io/2026-08-15-SF-0HumanCompanyHack-firm/">Broker</a>,
+    an agent-run company. Two repositories, two agents, and no human at either
+    end.
+  </p>
+
+  <section class="chart-card">
+    <h2 class="chart-title">The mandate</h2>
+    <p class="quote" id="mandate">&mdash;</p>
+    <p class="mono muted">
+      The assistant does not ask permission per purchase. It was granted a
+      standing authority once, with a ceiling, and it spends inside it.
+    </p>
+  </section>
+
+  <section class="chart-card">
+    <h2 class="chart-title">What it did</h2>
+    <div class="flow" id="flow"></div>
+    <p class="empty" id="flow-empty">loading&hellip;</p>
+  </section>
+
+  <section class="chart-card">
+    <h2 class="chart-title">It decides its own payments</h2>
+    <p class="muted">
+      The firm gets no say in this. The client evaluates the deliverable against
+      its own criteria and can decline &mdash; an empty answer, a price above the
+      mandate, or expert rates charged for an agent-only guess are all refused.
+    </p>
+    <p class="mono" id="verdict">&mdash;</p>
+  </section>
+
+  <section class="chart-card">
+    <h2 class="chart-title">It also attacks</h2>
+    <p class="muted">
+      The same agent runs an adversarial lane against the firm, over the real
+      wire, from an identity that is not inside it. An attack the firm survives
+      is only evidence if the attacker was never inside.
+    </p>
+    <div class="chips" id="attacks"></div>
+  </section>
+
+  <section class="chart-card">
+    <h2 class="chart-title">Credentials</h2>
+    <p class="muted">
+      The payer holds the payment credential; the firm holds a read-only key and
+      can only observe that money arrived. A supplier who can charge you at will
+      is not a counterparty, it is a subscription.
+    </p>
+    <p class="mono muted">
+      client &rarr; sk_test_ (settles) &middot; firm &rarr; rk_ (reads) &middot;
+      settlement refuses any key that is not a test key
+    </p>
+  </section>
+
+</main>
+
+<script>
+// No credentials here by construction. Reads its own committed record, plus the
+// firm's published ledger — same origin, so no proxy and no server.
+(async () => {
+  const get = async (p) => {
+    try { const r = await fetch(p, { cache: "no-store" }); return r.ok ? await r.json() : null; }
+    catch { return null; }
+  };
+  const money = (s) => {
+    const n = Number(s ?? 0);
+    return `${n < 0 ? "-" : ""}$${Math.abs(n).toFixed(2)}`;
+  };
+
+  const a = await get("activity.json");
+  if (!a) { document.getElementById("flow-empty").textContent = "No activity published yet."; return; }
+
+  document.getElementById("mandate").textContent = a.mandate;
+  document.getElementById("verdict").textContent =
+    `${a.evaluation.acceptable ? "PAY" : "DECLINE"} ${money(a.evaluation.pay_usd)} — ${a.evaluation.reason}`;
+  document.getElementById("attacks").innerHTML =
+    a.attacks.map((x) => `<span class="chip">${x}</span>`).join("");
+
+  // Did the payment actually land on the firm's side? Ask the firm's ledger.
+  const ledger = await get("/2026-08-15-SF-0HumanCompanyHack-firm/runs/ledger.json");
+  const confirmed = ledger && Number(ledger.transactions) > 0;
+
+  const steps = [
+    { who: "mandate", did: "standing authority granted", why: a.mandate, amt: null, cls: "hold" },
+    { who: "order", did: "placed a work order", why: a.order.question, amt: null, cls: "" },
+    { who: "evaluate", did: a.evaluation.acceptable ? "accepted the deliverable" : "declined",
+      why: a.evaluation.reason, amt: null, cls: "" },
+    { who: "settle", did: `PaymentIntent ${a.settlement.status}`,
+      why: `${a.settlement.id} · ${a.settlement.livemode ? "live" : "sandbox"} · confirmed with a test card, no browser and no human`,
+      amt: a.settlement.amount_usd, cls: "pay" },
+    { who: "confirm", did: confirmed ? "the firm's ledger shows it" : "awaiting the firm's ledger",
+      why: confirmed
+        ? `the firm independently reports ${ledger.transactions} settled transaction(s) totalling ${money(ledger.revenue_usd)}`
+        : "the firm publishes revenue on a schedule; this reconciles when it next runs",
+      amt: null, cls: confirmed ? "" : "hold" },
+  ];
+
+  document.getElementById("flow-empty").remove();
+  document.getElementById("flow").innerHTML = steps.map((s) => `
+    <div class="step">
+      <i class="dot ${s.cls}"></i>
+      <div class="who">${s.who}</div>
+      <div><div class="did">${s.did}</div><p class="why">${s.why}</p></div>
+      ${s.amt ? `<span class="amt out">${money(s.amt)}</span>` : `<span class="amt zero">&mdash;</span>`}
+    </div>`).join("");
+})();
+</script>
+
+</body>
+</html>
