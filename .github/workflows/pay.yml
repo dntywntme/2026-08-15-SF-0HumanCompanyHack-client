@@ -8,17 +8,24 @@ name: pay
 on:
   workflow_dispatch:
     inputs:
-      amount_usd:
-        description: "Amount to settle (USD). Stripe rejects anything under 0.50."
+      mode:
+        description: "judge — read the firm's deliverable and pay only if it passes; fixed — settle the amount below"
         required: true
+        type: choice
+        options: [judge, fixed]
+        default: judge
+      amount_usd:
+        description: "fixed mode only. Stripe rejects anything under 0.50."
+        required: false
         default: "1.00"
       order_id:
-        description: "Work order this payment settles"
-        required: true
+        description: "fixed mode only: the work order this payment settles"
+        required: false
         default: "wo-1"
 
 permissions:
-  contents: read
+  # Write, because the run commits what the agent did to web/activity.json.
+  contents: write
 
 jobs:
   settle:
@@ -33,12 +40,32 @@ jobs:
 
       - run: uv sync
 
-      - name: Settle the invoice
+      # The whole loop, unattended: read what the firm published, validate it
+      # against our own contract, judge it against the standing mandate, and
+      # settle only if it passes. Nothing here asks a human anything.
+      - name: Judge the deliverable and settle it
+        if: inputs.mode == 'judge'
         env:
           # sk_test_ only. pay.py refuses any other key shape, so an agent
           # settling with no human in the loop cannot reach live money.
+          CLIENT_STRIPE_KEY: ${{ secrets.CLIENT_STRIPE_KEY }}
+        run: uv run client --settle
+
+      - name: Settle a fixed amount
+        if: inputs.mode == 'fixed'
+        env:
           CLIENT_STRIPE_KEY: ${{ secrets.CLIENT_STRIPE_KEY }}
         run: |
           uv run client \
             --pay "${{ inputs.amount_usd }}" \
             --order-id "${{ inputs.order_id }}"
+
+      # The client's page renders what the agent emitted, so a settlement that
+      # is not committed is a settlement the page cannot report.
+      - name: Publish what the agent did
+        run: |
+          git config user.name "client-bot"
+          git config user.email "client-bot@users.noreply.github.com"
+          git add web/activity.json
+          git diff --staged --quiet || git commit -m "chore(activity): what the agent did"
+          git push origin HEAD:main

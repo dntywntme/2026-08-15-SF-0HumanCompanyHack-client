@@ -33,6 +33,9 @@
   .amt.out { color: var(--success); }
   .amt.zero { color: var(--text-muted); font-weight: 400; }
   .chips { display: flex; gap: .4rem; flex-wrap: wrap; margin-top: .5rem; }
+  /* Duplicated verbatim on Broker's page. Two repositories that share no build
+     step cannot share a stylesheet without coupling them more than the
+     duplication costs, so the rules are marked in both and edited in both. */
   .quote { border-left: 2px solid var(--border); padding-left: .9rem; margin: .6rem 0;
            color: var(--text-muted); }
   @media (max-width: 560px) {
@@ -156,9 +159,17 @@
   const ledger = await get("/2026-08-15-SF-0HumanCompanyHack-firm/runs/ledger.json");
   const confirmed = ledger && Number(ledger.transactions) > 0;
 
+  const d = a.deliverable;
   const steps = [
-    { who: "mandate", did: "standing authority granted", why: a.mandate, amt: null, cls: "hold" },
+    { who: "mandate", did: "standing authority granted",
+      why: `${a.mandate}${a.mandate_ceiling_usd
+        ? ` The ceiling is enforced in code: an invoice above ${money(a.mandate_ceiling_usd)} is escalated, not settled.`
+        : ""}`,
+      amt: null, cls: "hold" },
     { who: "order", did: "placed a work order", why: a.order.question, amt: null, cls: "" },
+    ...(d ? [{ who: "received", did: "read Broker's published deliverable",
+      why: `“${d.answer}” · sourced_from ${d.sourced_from} · asking ${money(d.price_usd)}`,
+      amt: null, cls: "" }] : []),
     { who: "evaluate", did: a.evaluation.acceptable ? "accepted the deliverable" : "declined",
       why: a.evaluation.reason, amt: null, cls: "" },
     { who: "settle", did: `PaymentIntent ${a.settlement.status}`,

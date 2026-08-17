@@ -1,21 +1,4 @@
 {
-  "mandate": "Investor pitch at 18:00. Standing authority to buy decision support under $1.00.",
-  "order": {
-    "id": "wo-1",
-    "budget_usd": "1.00",
-    "question": "Which headline is more compelling: 'Ship faster with AI' or 'Your on-call engineer that never sleeps'?"
-  },
-  "evaluation": {
-    "acceptable": true,
-    "reason": "sourced from humans, priced inside budget",
-    "pay_usd": "1.00"
-  },
-  "settlement": {
-    "id": "pi_3U4qf2RnJXMb8QAR0937akpA",
-    "status": "succeeded",
-    "amount_usd": "1.00",
-    "livemode": false
-  },
   "attacks": [
     "prompt-injection",
     "field-smuggling",
@@ -23,5 +6,29 @@
     "cogs-drain",
     "exfiltration",
     "malformed"
-  ]
+  ],
+  "deliverable": {
+    "answer": "Headline B wins. Buyers said it states the benefit rather than the category, and that 'ship faster' reads as generic.",
+    "price_usd": "1.00",
+    "sourced_from": "agent+human",
+    "work_order_id": "wo-1"
+  },
+  "evaluation": {
+    "acceptable": true,
+    "pay_usd": "1.00",
+    "reason": "meets spec"
+  },
+  "mandate": "Investor pitch at 18:00. Standing authority to buy decision support under $4.50.",
+  "mandate_ceiling_usd": "4.50",
+  "order": {
+    "budget_usd": "4.50",
+    "id": "wo-1",
+    "question": "Which headline is more compelling: 'Ship faster with AI' or 'Your on-call engineer that never sleeps'?"
+  },
+  "settlement": {
+    "amount_usd": "1.00",
+    "id": "pi_3U4qf2RnJXMb8QAR0937akpA",
+    "livemode": false,
+    "status": "succeeded"
+  }
 }
