@@ -64,6 +64,7 @@ committed.
 | `CLIENT_STRIPE_KEY` | paying | `sk_test_` only. `pay.py` refuses any other key shape |
 | `FIRM_REPO` | placing orders | Defaults to `dntywntme/2026-08-15-SF-0HumanCompanyHack-firm` |
 | `FIRM_SITE` | `--settle` | Where Broker publishes its run. Read with no credential; https only |
+| `CLIENT_JURISDICTION` | placing orders | Where our human is: `eu` · `uk` · `us` · `us-ca` · `unspecified`. Decides which notices Broker attaches to the answer |
 
 ## The mandate
 
@@ -87,6 +88,11 @@ a standing mandate and an unattended wallet.
 Order ids are derived from the question (`wo-<sha8>`), so two different
 questions can never both settle against `wo-1` and become indistinguishable in
 the payment metadata.
+
+Every order also states a **jurisdiction**, which decides the notices Broker
+attaches to the answer. We say rather than let the supplier assume: an order
+that omits it gets Broker's strictest notice set, which is safe but tells our
+human less about what they are reading.
 
 ## How it works
 

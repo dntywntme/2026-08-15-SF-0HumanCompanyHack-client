@@ -9,6 +9,7 @@ from pydantic import ValidationError
 
 from client.agent import (
     ATTACKS,
+    JURISDICTION,
     MANDATE_CEILING_USD,
     MandateExceeded,
     compose_order,
@@ -131,6 +132,26 @@ def test_different_questions_get_different_order_ids():
 
 def test_an_explicit_order_id_still_wins():
     assert compose_order("q", order_id="wo-1").id == "wo-1"
+
+
+def test_every_order_states_where_our_human_is():
+    # Left unstated, Broker applies its strictest notice set. That is safe and
+    # less informative, so we say.
+    assert compose_order("q").jurisdiction == JURISDICTION
+    assert JURISDICTION != "unspecified"
+
+
+def test_a_jurisdiction_the_wire_format_forbids_is_refused_here_first():
+    # Our contract mirrors Broker's. Catching it on this side means a malformed
+    # order never reaches the boundary at all.
+    with pytest.raises(ValidationError):
+        WorkOrder(
+            id="wo-1",
+            client_id="c",
+            question="q",
+            budget_usd=Decimal("1.00"),
+            jurisdiction="California",
+        )
 
 
 def test_attack_payloads_violate_our_own_contract():

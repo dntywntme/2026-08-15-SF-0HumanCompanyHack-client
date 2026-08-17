@@ -28,6 +28,12 @@ class WorkOrder(BaseModel):
     client_id: str = Field(min_length=1, max_length=64)
     question: str = Field(min_length=1, max_length=4000)
     budget_usd: Decimal = Field(ge=0, decimal_places=2)
+    # Where our human is, which decides which notices Broker attaches to the
+    # answer. We state it rather than letting the supplier guess -- an omitted
+    # jurisdiction gets the strictest set, which is safe but not accurate.
+    jurisdiction: str = Field(
+        default="unspecified", max_length=16, pattern=r"^[a-z]{2}(-[a-z]{2})?$|^unspecified$"
+    )
 
     def payload(self) -> dict[str, Any]:
         return self.model_dump(mode="json")

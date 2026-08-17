@@ -51,6 +51,11 @@ DEFAULT_QUESTION = (
     "'Your on-call engineer that never sleeps'?"
 )
 
+# Where our human is. Stated on every order rather than left for the supplier to
+# assume: an omitted jurisdiction gets Broker's strictest notice set, which is
+# safe but tells our human less about the answer they are reading.
+JURISDICTION = os.environ.get("CLIENT_JURISDICTION", "").strip().lower() or "us-ca"
+
 # Where Broker publishes. Public, unauthenticated, and the same URL a judge would
 # open -- we read the counterparty's own published artifact rather than trusting
 # a private channel.
@@ -90,6 +95,7 @@ def compose_order(
         client_id=CLIENT_ID,
         question=question,
         budget_usd=budget,
+        jurisdiction=JURISDICTION,
     )
 
 
