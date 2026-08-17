@@ -1,0 +1,45 @@
+name: ci
+
+# The demand side gates its own merges too. The firm has had this since the
+# first day and the client did not, which meant half of a two-repository claim
+# was tested and the other half was hoped for.
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v7
+        with:
+          python-version: "3.12"
+
+      - name: Sync
+        run: uv sync
+
+      - name: Lint
+        run: |
+          uv run ruff check .
+          uv run ruff format --check .
+
+      - name: Test
+        run: uv run pytest
+
+      - name: The dry-run lanes must work with no credentials at all
+        # These are what the README tells a reader to run first. If they need a
+        # key, the first thing anyone tries fails.
+        env:
+          CLIENT_GITHUB_TOKEN: ""
+          CLIENT_STRIPE_KEY: ""
+        run: |
+          uv run client --dry-run
+          uv run client --adversarial --dry-run
