@@ -24,6 +24,8 @@ import urllib.request
 from decimal import Decimal
 from typing import Any
 
+from client.http import open_https
+
 STRIPE_API = "https://api.stripe.com/v1"
 TEST_PAYMENT_METHOD = "pm_card_visa"
 
@@ -42,7 +44,8 @@ def _post(path: str, key: str, form: dict[str, Any], timeout: float = 20.0) -> d
         },
     )
     try:
-        with urllib.request.urlopen(req, timeout=timeout) as resp:
+        # The payment key travels in this header; nothing but https may carry it.
+        with open_https(req, timeout) as resp:
             return json.load(resp)
     except urllib.error.HTTPError as exc:
         try:

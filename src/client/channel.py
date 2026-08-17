@@ -19,6 +19,8 @@ import urllib.error
 import urllib.request
 from typing import Any
 
+from client.http import open_https
+
 GITHUB_API = "https://api.github.com"
 DEFAULT_FIRM_REPO = "dntywntme/2026-08-15-SF-0HumanCompanyHack-firm"
 
@@ -44,7 +46,8 @@ def _request(method: str, path: str, token: str, body: dict | None = None) -> di
         },
     )
     try:
-        with urllib.request.urlopen(req, timeout=20) as resp:
+        # The token travels in this header; nothing but https may carry it.
+        with open_https(req, 20) as resp:
             return json.load(resp)
     except urllib.error.HTTPError as exc:
         raise ChannelError(f"{method} {path} -> HTTP {exc.code}") from exc
@@ -105,6 +108,24 @@ def submit_order(
             "labels": ["work-order"],
         },
     )
+
+
+def fetch_published(url: str, timeout: float = 20.0) -> Any:
+    """Read a public artifact the firm published. No credential, by design.
+
+    Broker publishes its run checkpoints and its ledger as static JSON on
+    GitHub Pages, which is the honest channel for a counterparty: no token, no
+    account, nothing to revoke, and anyone else can fetch exactly what we fetch
+    and check that we read it correctly.
+    """
+    req = urllib.request.Request(url, headers={"User-Agent": "broker-client"})
+    try:
+        with open_https(req, timeout) as resp:
+            return json.load(resp)
+    except urllib.error.HTTPError as exc:
+        raise ChannelError(f"GET {url} -> HTTP {exc.code}") from exc
+    except (urllib.error.URLError, TimeoutError, OSError, ValueError) as exc:
+        raise ChannelError(f"GET {url} -> {type(exc).__name__}") from exc
 
 
 def read_replies(
