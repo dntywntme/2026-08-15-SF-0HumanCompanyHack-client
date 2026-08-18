@@ -9,6 +9,11 @@ The boundary is enforced by token scope, not by convention: the credential used
 here is expected to carry Issues:write on the firm repo and nothing else, so a
 compromised client can place an order but cannot push code, alter a workflow, or
 merge anything.
+
+Replies are not read back over this channel. A polling reader lived here and had
+no caller: the firm publishes its deliverable as static JSON, and `agent.py`
+fetches that with no credential at all, which is the better boundary anyway --
+anyone can fetch what we fetched and check we read it correctly.
 """
 
 from __future__ import annotations
@@ -126,15 +131,3 @@ def fetch_published(url: str, timeout: float = 20.0) -> Any:
         raise ChannelError(f"GET {url} -> HTTP {exc.code}") from exc
     except (urllib.error.URLError, TimeoutError, OSError, ValueError) as exc:
         raise ChannelError(f"GET {url} -> {type(exc).__name__}") from exc
-
-
-def read_replies(
-    issue_number: int, *, token: str | None = None, repo: str | None = None
-) -> list[dict[str, Any]]:
-    """Read the firm's replies. Polling, because a static site cannot receive."""
-    token = token or os.environ.get("CLIENT_GITHUB_TOKEN", "")
-    if not token:
-        raise ChannelError("CLIENT_GITHUB_TOKEN is not set")
-    repo = repo or os.environ.get("FIRM_REPO", DEFAULT_FIRM_REPO)
-    result = _request("GET", f"/repos/{repo}/issues/{issue_number}/comments", token)
-    return result if isinstance(result, list) else []
