@@ -55,6 +55,20 @@ uv run client --settle --dry-run
 uv run client --adversarial --dry-run
 ```
 
+### Running the whole loop with no human in it
+
+Both legs run unattended in Actions, which is what makes this a counterparty
+rather than a script someone runs:
+
+| Workflow | Does |
+|---|---|
+| **`order`** (dispatch) | places a work order as a GitHub Issue on Broker's repo |
+| **`pay`** (dispatch, `judge` mode) | reads Broker's published deliverable, judges it against the mandate, and settles only if it passes |
+
+`order` is dispatch-only on purpose. A cron here would open an issue on someone
+else's repository on a timer and trigger a pipeline run for each one — an
+ordering loop is a spamming loop, and the counterparty pays for it.
+
 Copy `.env.example` to `.env`, which is gitignored. Nothing here is ever
 committed.
 

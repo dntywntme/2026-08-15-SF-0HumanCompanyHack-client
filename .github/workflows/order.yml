@@ -1,0 +1,62 @@
+name: order
+
+# The client agent placing a work order, unattended. This was the one leg of the
+# loop that still needed a person: settlement ran in Actions from day one, but
+# ordering only ever worked from a laptop with a local token, so every order on
+# the firm's tracker was opened by hand. That is a hole in "no human at either
+# end", and this closes it.
+#
+# Dispatch only, deliberately. A cron here would open an issue on someone else's
+# repository on a timer and trigger a pipeline run for each one — an ordering
+# loop is a spamming loop, and the counterparty is the one who pays for it.
+
+on:
+  workflow_dispatch:
+    inputs:
+      question:
+        description: "What to ask Broker. Opinion research only — legal, medical and financial questions are refused at Broker's compliance gate, which is itself worth demonstrating."
+        required: true
+        default: "Which headline is more compelling: 'Ship faster with AI' or 'Your on-call engineer that never sleeps'?"
+
+permissions:
+  # Write, because the run commits what the agent did to web/activity.json.
+  contents: write
+
+concurrency:
+  group: order
+  cancel-in-progress: false
+
+jobs:
+  place:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v7
+        with:
+          python-version: "3.12"
+
+      - run: uv sync
+
+      - name: Place the order
+        env:
+          # Scoped to Issues:write on the firm repo and nothing else. That scope
+          # IS the trust boundary: with it this agent can place an order and
+          # cannot push code, merge, or edit a workflow over there.
+          CLIENT_GITHUB_TOKEN: ${{ secrets.CLIENT_GITHUB_TOKEN }}
+          CLIENT_JURISDICTION: us-ca
+          # Passed as an environment variable rather than interpolated into the
+          # shell. A dispatch input is untrusted text, and the whole premise of
+          # this project is that a question is data and never instructions --
+          # that has to hold on our side of the wire too.
+          QUESTION: ${{ inputs.question }}
+        run: uv run client --question "$QUESTION"
+
+      - name: Publish what the agent did
+        run: |
+          git config user.name "client-bot"
+          git config user.email "client-bot@users.noreply.github.com"
+          git add web/activity.json
+          git diff --staged --quiet || git commit -m "chore(activity): placed a work order"
+          git push origin HEAD:main
