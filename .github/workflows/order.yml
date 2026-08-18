@@ -21,6 +21,10 @@ on:
 permissions:
   # Write, because the run commits what the agent did to web/activity.json.
   contents: write
+  # ...and these two because it then publishes the page itself. See the deploy
+  # step: a GITHUB_TOKEN push does not trigger pages.yml.
+  pages: write
+  id-token: write
 
 concurrency:
   group: order
@@ -60,3 +64,21 @@ jobs:
           git add web/activity.json
           git diff --staged --quiet || git commit -m "chore(activity): placed a work order"
           git push origin HEAD:main
+
+      # A push made with the default GITHUB_TOKEN does not trigger another
+      # workflow, so pages.yml never notices this commit. Without deploying
+      # here, the agent acts, the record is committed, and the published page
+      # keeps showing what happened last time -- a page that asserts what the
+      # agent did while never seeing what it did.
+      - name: Publish the site itself
+        run: |
+          mkdir -p _site
+          cp -r web/. _site/
+          touch _site/.nojekyll
+          test -f _site/index.html
+
+      - uses: actions/configure-pages@v5
+      - uses: actions/upload-pages-artifact@v4
+        with:
+          path: _site
+      - uses: actions/deploy-pages@v4
