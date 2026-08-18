@@ -18,12 +18,13 @@
     "pay_usd": "1.00",
     "reason": "meets spec"
   },
+  "issue_url": "https://github.com/dntywntme/2026-08-15-SF-0HumanCompanyHack-firm/issues/5",
   "mandate": "Investor pitch at 18:00. Standing authority to buy decision support under $4.50.",
   "mandate_ceiling_usd": "4.50",
   "order": {
     "budget_usd": "4.50",
-    "id": "wo-1",
-    "question": "Which headline is more compelling: 'Ship faster with AI' or 'Your on-call engineer that never sleeps'?"
+    "id": "wo-e930e481",
+    "question": "Which onboarding first step feels more trustworthy to a developer: a hosted live demo, or a one-command local replay they run themselves?"
   },
   "settlement": {
     "amount_usd": "1.00",
